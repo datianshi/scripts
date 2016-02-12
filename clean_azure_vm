@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+require "json"
+
+#nic_json = `azure network nic list bosh-res-group --json`
+
+nics_hash = JSON.parse(File.read("/tmp/manifests/nic.json"))
+nics = {}
+nics_hash.each  { |nic|
+    name = nic["name"]
+    # ip = nic["ipConfigurations"][0]["privateIpAddress"]
+    vm = nic["virtualMachine"]
+    if vm!=nil
+      vm = vm["id"]
+    end
+    subnet = nic["ipConfigurations"][0]["subnet"]["id"]
+    nics[name] = {"name" => name, "subnet" => subnet.split("/").last, "vm" => vm == nil ? nil : vm.split("/").last}
+}
+
+nics.each { |k, nic|
+  if nic["subnet"] == "cfsubnet"
+    if nic["vm"] != nil
+      delete_vm = "azure vm delete bosh-res-group #{nic["vm"]} -q"
+      puts delete_vm
+      `#{delete_vm}`
+    end
+    delete_nic = "azure network nic delete bosh-res-group #{nic["name"]} -q"
+    puts delete_nic
+    `#{delete_nic}`
+  end
+}
+
+#nics_hash = JSON.parse(File.read("/tmp/manifests/nic.json"))
+
+
+# puts nics
