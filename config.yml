@@ -1,0 +1,22 @@
+bosh:
+  address: 40.114.46.190
+  username: admin
+  password: admin
+token: z3LT5TN4fyg1JE2yscfW
+skip_download: true
+products:
+  - name: rabbitmq
+    version: 1.5.5
+    link: https://network.pivotal.io/api/v2/products/pivotal-rabbitmq-service/releases/1412/product_files/3806/download
+  - name: mysql
+    version: 1.7.3
+    link: https://network.pivotal.io/api/v2/products/p-mysql/releases/1410/product_files/3804/download
+  - name: redis
+    version: 1.5.7
+    link: https://network.pivotal.io/api/v2/products/p-redis/releases/1408/product_files/3802/download
+  - name: scs
+    version: 1.0.4
+    link: https://network.pivotal.io/api/v2/products/p-spring-cloud-services/releases/1415/product_files/3816/download
+  - name: pcf
+    version: 1.6.14
+    link: https://network.pivotal.io/api/v2/products/elastic-runtime/releases/1395/product_files/3793/download

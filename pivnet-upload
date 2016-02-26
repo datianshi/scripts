@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+
+config = YAML.load_file "config.yml"
+
+def download(product)
+    download = download_template % {product: product['name'], token:config['token'], link:product['link']}
+    puts download
+    `#{download}`
+    unzip = "mkdir -p #{product['name']} && unzip #{product['name']}.zip -d #{product['name']}"
+    puts unzip
+    `#{unzip}`
+end
+
+def upload(product)
+    Dir.foreach("#{product['name']}/releases") do |release|
+        next if release == '.' or release == '..'
+        upload_release = "bosh upload release #{product['name']}/releases/#{release} --skip-if-exists"
+        puts upload_release
+        `#{upload_release}`
+    end
+end
+
+target = "bosh target #{config['bosh']['address']}"
+puts target
+`#{target}`
+login = "bosh login #{config['bosh']['username']} #{config['bosh']['password']}"
+puts login
+`#{login}`
+
+download_template = 'wget -O %{product}.zip --post-data="" --header="Authorization: Token %{token}" %{link}'
+config['products'].each { |product|
+   if !File.exist?("#{product['name']}.zip")
+     download(product)
+   end
+   upload(product)
+}
